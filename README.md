@@ -2,12 +2,14 @@
 
 Can be ran interactively without any flags
 
-```python make_finder.py
+```
+python make_finder.py
 ```
 
 Or non-interactively with the ```not``` flag:
 
-```python make_finder.py not
+```
+python make_finder.py not
 ```
 
 If running non-interactively, execuse a function as the one below:
