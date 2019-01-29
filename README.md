@@ -23,4 +23,5 @@ The result will be an image like this:
 Additional instructions can be added to the xlabel
 
 # Future updates
-- support for 3PI .fits image query
+- support for 3PI .fits image query.
+- Ability to mark offset stars.
