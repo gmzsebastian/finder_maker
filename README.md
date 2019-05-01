@@ -1,27 +1,29 @@
 ## Finder Maker
 
-Can be ran interactively without any flags
+There are two scripts to create finders from either A) an image you have, or B) an image of a TNS or ZTF transient that you don't have that you want to download from PS1.
 
+You can run it like this:
 ```
-python make_finder.py
-```
-
-Or non-interactively with the ```not``` flag:
-
-```
-python make_finder.py not
+python local_finder.py image_name.fits
 ```
 
-If running non-interactively, execuse a function as the one below:
-
-```python
-create_finder(aperture_size_pix, image_radius_pix, arrow_size_wcs, image_upper_std, image_lower_std, '11:50:58.0924', '10:23:35.5934', 'ZTF18adbyxua', 'g', instructions, interactive = False, image_name = 'ZTF18adbyxua.fits', do_tde = 'y', do_detection = 'y')
 ```
+python local_finder.py SN2016iet
+```
+
+```
+python local_finder.py 2018hyz
+```
+
+```
+python local_finder.py ZTF18ablvime
+```
+
+Or you can run without specifying the object name, you will be prompted as the first step.
 
 The result will be an image like this:
 <p align="center"><img src="AT_2018hti_finder.jpg" align="center" alt="2017gwm" width="900"/></p>
 Additional instructions can be added to the xlabel
 
 # Future updates
-- support for 3PI .fits image query.
 - Ability to mark offset stars.
