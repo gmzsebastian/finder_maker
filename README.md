@@ -4,19 +4,19 @@ There are two scripts to create finders from either A) an image you have, or B) 
 
 You can run it like this:
 ```
-python local_finder.py image_name.fits
+python make_finder.py image_name.fits
 ```
 
 ```
-python local_finder.py SN2016iet
+python get_finder.py SN2016iet
 ```
 
 ```
-python local_finder.py 2018hyz
+python get_finder.py 2018hyz
 ```
 
 ```
-python local_finder.py ZTF18ablvime
+python get_finder.py ZTF18ablvime
 ```
 
 Or you can run without specifying the object name, you will be prompted as the first step. If you want to run this from any directory you can reference the script in your `bash_profile` with something like:
