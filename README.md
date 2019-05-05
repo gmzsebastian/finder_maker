@@ -19,11 +19,13 @@ python local_finder.py 2018hyz
 python local_finder.py ZTF18ablvime
 ```
 
-Or you can run without specifying the object name, you will be prompted as the first step. If you want to run this from any directory you can reference the script in your `bash_profile` with something like `alias finder='python /Users/Documents/get_finder.py`, and then run from the terminal as `finder 2016iet`.
+Or you can run without specifying the object name, you will be prompted as the first step. If you want to run this from any directory you can reference the script in your `bash_profile` with something like:
+`alias getfinder='ipython /Users/path_to_script/get_finder.py'`
+`alias makefinder='ipython /Users/path_to_script/make_finder.py`'
+then run from the terminal with something like `gefinder AT2016iet`.
 
 The result will be an image like this:
 <p align="center"><img src="AT_2018hti_finder.jpg" align="center" alt="2017gwm" width="900"/></p>
 Additional instructions can be added to the xlabel
 
-# Future updates
-- Ability to mark offset stars.
+You will be prompted if you want to change the target Name, RA, DEC, filter band, image size, and if you want to add an offset/guide star.
