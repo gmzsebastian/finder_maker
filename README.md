@@ -34,4 +34,5 @@ Additional instructions can be added to the xlabel
 You will be prompted if you want to change the target Name, RA, DEC, filter band, image size, and if you want to add an offset/guide star.
 
 If you would rather use it as a package, you can install it with `setup.py` and then:
+
 ```from finder_maker.functions import create_finder```
