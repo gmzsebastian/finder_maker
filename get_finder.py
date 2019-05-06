@@ -89,14 +89,17 @@ else:
 # Generate the Template
 try:
     wcs_object, refdata = generate_template(ra, dec, color, object_name, int(out_size) * 3, image_radius = 250)
+    continue_run = True
 except:
     print('Object Probably not in 3PI')
+    continue_run = False
 
 # Plot Parameters
 aperture_size_pix = 10   # Size of target aperture
 arrow_size_wcs    = 1    # Size of arrows in compass in arcmin
 image_upper_std   = 4.0  # Image upper std for plotting 
 image_lower_std   = 10.0 # Image lower std for plotting
-
 print(out_size)
-create_finder(aperture_size_pix, int(out_size), arrow_size_wcs, image_upper_std, image_lower_std, ra, dec, object_name, color, instructions, wcs_data = wcs_object, image_data = refdata, offset_coords = offset_coords)
+
+if continue_run:
+    create_finder(aperture_size_pix, int(out_size), arrow_size_wcs, image_upper_std, image_lower_std, ra, dec, object_name, color, instructions, wcs_data = wcs_object, image_data = refdata, offset_coords = offset_coords)
