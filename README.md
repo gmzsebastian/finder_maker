@@ -20,8 +20,11 @@ python get_finder.py ZTF18ablvime
 ```
 
 Or you can run without specifying the object name, you will be prompted as the first step. If you want to run this from any directory you can reference the script in your `bash_profile` with something like:
+
 `alias getfinder='ipython /Users/path_to_script/get_finder.py'`
-`alias makefinder='ipython /Users/path_to_script/make_finder.py`'
+
+`alias makefinder='ipython /Users/path_to_script/make_finder.py`
+
 then run from the terminal with something like `gefinder AT2016iet`.
 
 The result will be an image like this:
