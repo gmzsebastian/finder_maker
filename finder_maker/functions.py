@@ -1,3 +1,4 @@
+import pathlib
 import numpy as np
 import matplotlib.pyplot as plt
 from astropy.io import fits
@@ -269,12 +270,13 @@ def query_TNS(object_name):
     Just in case it's a TDE.
     '''
     # Query TNS objects to get image and name
-    api_key     = str(np.genfromtxt('/Users/key.txt', dtype = 'str'))
-    name_break  = object_name.find('2')
-    url_tns_api = "https://wis-tns.weizmann.ac.il/api/get"
-    get_obj     = [("objname",object_name[name_break:].replace(' ', '')), ("photometry","0"), ("spectra","0")]
-    response    = get_tns(url_tns_api,get_obj,api_key)
-    data        = response.json()['data']['reply']
+    key_location = os.path.join(pathlib.Path.home(), 'key.txt')
+    api_key      = str(np.genfromtxt(key_location, dtype = 'str'))
+    name_break   = object_name.find('2')
+    url_tns_api  = "https://wis-tns.weizmann.ac.il/api/get"
+    get_obj      = [("objname",object_name[name_break:].replace(' ', '')), ("photometry","0"), ("spectra","0")]
+    response     = get_tns(url_tns_api,get_obj,api_key)
+    data         = response.json()['data']['reply']
 
     # Extract RA and DEC
     ra  = response.json()['data']['reply']['radeg']
