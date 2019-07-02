@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from astropy.io import fits
 from astropy import wcs
 import requests
-from functions import create_finder
+from finder_maker.functions import create_finder
 import sys
 
 script = np.where(['_finder.py' in i for i in sys.argv])[0][0]

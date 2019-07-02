@@ -7,7 +7,7 @@ from astropy import wcs
 from reproject import reproject_interp
 import json
 import sys
-from functions import *
+from finder_maker.functions import *
 
 script = np.where(['_finder.py' in i for i in sys.argv])[0][0]
 if len(sys.argv) > script + 1:
