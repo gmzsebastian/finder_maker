@@ -5,11 +5,10 @@ setup(name='finder_maker',
       description='Generate or Download Star Finders',
       url='https://github.com/gmzsebastian/finder_maker',
       author=['Sebastian Gomez'],
-      author_email=[
-          'sgomez@cfa.harvard.edu',
-      ],
+      author_email=['sgomez@cfa.harvard.edu'],
       license='GNU GPL 3.0',
-      packages=['finder_maker'],
+      py_modules=['finder_maker.py'],
+      scripts=['get_finder.py', 'make_finder.py'],
       install_requires=[
             'numpy',
             'matplotlib',
@@ -20,4 +19,4 @@ setup(name='finder_maker',
             'bs4',
       ],
       test_suite='nose.collector',
-      zip_safe = False)
+      zip_safe=False)

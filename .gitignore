@@ -4,3 +4,4 @@ dist/
 finder_maker.egg-info/
 */__pycache__
 __pycache__
+.idea/
