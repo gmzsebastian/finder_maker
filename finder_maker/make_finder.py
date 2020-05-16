@@ -122,4 +122,4 @@ arrow_size_wcs    = 1    # Size of arrows in compass in arcmin
 image_upper_std   = 4.0  # Image upper std for plotting 
 image_lower_std   = 10.0 # Image lower std for plotting
 
-create_finder(aperture_size_pix, int(image_radius_pix), arrow_size_wcs, image_upper_std, image_lower_std, target_RA, target_DEC, target_name, target_color, instructions, wcs_data = wcs_data, image_data = image_data, offset_coords = offset_coords)
+create_finder(aperture_size_pix, int(image_radius_pix), arrow_size_wcs, image_upper_std, image_lower_std, target_RA, target_DEC, target_name, instructions, target_color, wcs_data = wcs_data, image_data = image_data, offset_coords = offset_coords)

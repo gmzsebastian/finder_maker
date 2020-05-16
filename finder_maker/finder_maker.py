@@ -20,6 +20,7 @@ from reproject import reproject_interp
 from collections import OrderedDict
 import json
 import warnings
+from astropy import units as u
 
 def get_coords(ra_in, dec_in):
     '''
@@ -44,7 +45,7 @@ def get_coords(ra_in, dec_in):
 
     return ra, dec
 
-def create_finder(aperture_size_pix, image_radius_pix, arrow_size_wcs, image_upper_std, image_lower_std, ra_in, dec_in, target_name, target_color, instructions, interactive = True, wcs_data = '', image_data = '', offset_coords = ''):
+def create_finder(aperture_size_pix, image_radius_pix, arrow_size_wcs, image_upper_std, image_lower_std, ra_in, dec_in, target_name, instructions, target_color = '', interactive = True, wcs_data = '', image_data = '', offset_coords = ''):
     '''
     Create a finder chart from an image at the specified coordinates
 
@@ -52,7 +53,7 @@ def create_finder(aperture_size_pix, image_radius_pix, arrow_size_wcs, image_upp
     ---------------
     aperture_size_pix : Size of the aperture in pixels
     image_radius_pix  : Size of the image in pixels
-    arrow_size_wcs    : Size of the compass in arcsec
+    arrow_size_wcs    : Size of the compass in arcmin
     image_upper_std   : Upper sigma for plotting
     image_lower_std   : Lower sigma for plotting
     ra_in, dec_in     : RA and DEC input
@@ -76,9 +77,9 @@ def create_finder(aperture_size_pix, image_radius_pix, arrow_size_wcs, image_upp
     target_aperture = CircularAperture(coord_pix, r=aperture_size_pix)
 
     # Image Information, and calculate background counts
-    xmin = int(coord_pix[0] - image_radius_pix)
+    xmin = max(int(coord_pix[0] - image_radius_pix), 0)
     xmax = int(coord_pix[0] + image_radius_pix)
-    ymin = int(coord_pix[1] - image_radius_pix)
+    ymin = max(int(coord_pix[1] - image_radius_pix), 0)
     ymax = int(coord_pix[1] + image_radius_pix)
     cropped_data = image_data[ymin:ymax,xmin:xmax]
 
@@ -91,8 +92,16 @@ def create_finder(aperture_size_pix, image_radius_pix, arrow_size_wcs, image_upp
     # Create Compass
     origin_x_pix,  origin_y_pix  = xmax - (image_radius_pix / 9), ymin + (image_radius_pix / 6)
     origin_x_wcs,  origin_y_wcs  = wcs_data.wcs_pix2world(origin_x_pix, origin_y_pix, 1)
-    east_x_shift,  east_y_shift  = wcs_data.wcs_world2pix(origin_x_wcs + arrow_size_wcs / 60, origin_y_wcs, 1)
-    north_x_shift, north_y_shift = wcs_data.wcs_world2pix(origin_x_wcs, origin_y_wcs + arrow_size_wcs / 60, 1)
+
+    # Offset Compass
+    compass_center = SkyCoord(origin_x_wcs, origin_y_wcs, frame = 'icrs', unit = 'deg')
+    separation     = arrow_size_wcs * u.arcmin
+    east_coords    = compass_center.directional_offset_by(90 * u.deg, separation) # East Shift
+    north_coords   = compass_center.directional_offset_by( 0 * u.deg, separation) # North Shift
+
+    # Calcualte Compass Offset locations
+    east_x_shift,  east_y_shift  = east_coords.to_pixel(wcs_data)
+    north_x_shift, north_y_shift = north_coords.to_pixel(wcs_data)
 
     # Get offset stars coordinates
     if offset_coords != '':
@@ -105,9 +114,15 @@ def create_finder(aperture_size_pix, image_radius_pix, arrow_size_wcs, image_upp
         coord_offset_pix      = wcs_data.wcs_world2pix(offset_RA, offset_DEC, 1)
         offset_aperture       = CircularAperture(coord_offset_pix, r=aperture_size_pix)
 
+        # Offset star offset
+        offset_star = SkyCoord(offset_RA, offset_DEC, unit=(u.deg, u.deg))
+        dra, ddec   = offset_star.spherical_offsets_to(coord)
+        offset_ra   = round(dra.to(u.arcsec).value, 2)
+        offset_dec  = round(ddec.to(u.arcsec).value, 2)
+
         # Plot Offset star 
         offset       = offset_aperture.plot(color='magenta', lw = 0.6)
-        offset_label = plt.text(coord_offset_pix[0], coord_offset_pix[1]+(image_radius_pix / 12), 'guide', fontweight = 'bold', color = 'k', alpha = 0.8, fontsize = 9)
+        offset_label = plt.text(coord_offset_pix[0], coord_offset_pix[1]+(image_radius_pix / 12), 'guide \n' + r'$\delta_{ra}$ : %s" $\delta_{dec}$ : %s"'%(offset_ra, offset_dec), fontweight = 'bold', color = 'k', alpha = 0.8, fontsize = 9)
         offset_label.set_path_effects([PathEffects.withStroke(linewidth=2, foreground='w')])
 
     # Plot
@@ -120,18 +135,19 @@ def create_finder(aperture_size_pix, image_radius_pix, arrow_size_wcs, image_upp
     aperture = target_aperture.plot(color='yellow', lw = 1)
     label = plt.text(coord_pix[0], coord_pix[1]+(image_radius_pix / 12), target_name, fontweight = 'bold', color = 'k', alpha = 0.8)
     # Band
-    color = plt.text(xmin + (image_radius_pix / 9), ymax - (image_radius_pix / 9), target_color + ' band', fontweight = 'bold', color = 'k', alpha = 0.8)
+    if target_color != '':
+        color = plt.text(xmin + (image_radius_pix / 9), ymax - (image_radius_pix / 9), target_color + ' band', fontweight = 'bold', color = 'k', alpha = 0.8)
+        color.set_path_effects([PathEffects.withStroke(linewidth=2, foreground='w')])
 
     # Compass
     arrow1 = plt.arrow(origin_x_pix, origin_y_pix, east_x_shift - origin_x_pix, east_y_shift - origin_y_pix, head_width=10, head_length=10, fc='k', ec='k')
     arrow2 = plt.arrow(origin_x_pix, origin_y_pix, north_x_shift - origin_x_pix, north_y_shift - origin_y_pix, head_width=10, head_length=10, fc='k', ec='k')
-    north = plt.text(north_x_shift-(image_radius_pix / 30), north_y_shift+(image_radius_pix / 10), 'N', fontweight='bold', color = 'k', alpha = 0.8)
-    east  = plt.text(east_x_shift-(image_radius_pix / 10),  east_y_shift-(image_radius_pix / 30), 'E', fontweight='bold', color = 'k', alpha = 0.8)
-    size  = plt.text(east_x_shift-0.5*(east_x_shift - origin_x_pix)-(image_radius_pix / 30),  east_y_shift-(image_radius_pix / 10), "1'", fontweight='bold', color = 'k', alpha = 0.8)
+    north  = plt.text(north_x_shift-(image_radius_pix / 30), north_y_shift+(image_radius_pix / 10), 'N', fontweight='bold', color = 'k', alpha = 0.8)
+    east   = plt.text(east_x_shift-(image_radius_pix / 10),  east_y_shift-(image_radius_pix / 30), 'E', fontweight='bold', color = 'k', alpha = 0.8)
+    size   = plt.text(east_x_shift-0.5*(east_x_shift - origin_x_pix)-(image_radius_pix / 30),  east_y_shift-(image_radius_pix / 10), "1'", fontweight='bold', color = 'k', alpha = 0.8)
 
     # plot borders
     label.set_path_effects([PathEffects.withStroke(linewidth=2, foreground='w')])
-    color.set_path_effects([PathEffects.withStroke(linewidth=2, foreground='w')])
     arrow1.set_path_effects([PathEffects.withStroke(linewidth=2, foreground='w')])
     arrow2.set_path_effects([PathEffects.withStroke(linewidth=2, foreground='w')])
     north.set_path_effects([PathEffects.withStroke(linewidth=2, foreground='w')])
@@ -181,6 +197,36 @@ def download_ps1_image(ra, dec, filt, save_template = False, plot_name = '', wor
         ccddata.write(template_filename, overwrite=True)
 
     return ccddata
+
+def angular_separation(lon1, lat1, lon2, lat2):
+    '''
+    Computes on-sky separation between one coordinate and another.
+
+    Parameters
+    ----------
+    Coordinates in degrees
+
+    Returns
+    -------
+    Separation in arcseconds
+    '''
+
+    # Convert to Radians
+    RA1, DEC1, RA2, DEC2 = lon1 * np.pi / 180, lat1 * np.pi / 180, lon2 * np.pi / 180, lat2 * np.pi / 180
+
+    # Do Math
+    sdlon = np.sin(RA2 - RA1)
+    cdlon = np.cos(RA2 - RA1)
+    slat1 = np.sin(DEC1)
+    slat2 = np.sin(DEC2)
+    clat1 = np.cos(DEC1)
+    clat2 = np.cos(DEC2)
+
+    num1 = clat2 * sdlon
+    num2 = clat1 * slat2 - slat1 * clat2 * cdlon
+    denominator = slat1 * slat2 + clat1 * clat2 * cdlon
+
+    return np.arctan2(np.hypot(num1, num2), denominator) * 3600 * 180 / np.pi
 
 def check_corner(data, ra_mod, dec_mod):
     '''
@@ -270,7 +316,7 @@ def query_TNS(object_name):
     Just in case it's a TDE.
     '''
     # Query TNS objects to get image and name
-    key_location = os.path.join(pathlib.Path.home(), 'key.txt')
+    key_location = os.path.join(pathlib.Path.home(), 'tns_key.txt')
     api_key      = str(np.genfromtxt(key_location, dtype = 'str'))
     name_break   = object_name.find('2')
     url_tns_api  = "https://wis-tns.weizmann.ac.il/api/get"

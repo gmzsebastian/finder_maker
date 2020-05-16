@@ -104,4 +104,4 @@ image_lower_std   = 10.0 # Image lower std for plotting
 print(out_size)
 
 if continue_run:
-    create_finder(aperture_size_pix, int(out_size), arrow_size_wcs, image_upper_std, image_lower_std, ra, dec, object_name, color, instructions, wcs_data = wcs_object, image_data = refdata, offset_coords = offset_coords)
+    create_finder(aperture_size_pix, int(out_size), arrow_size_wcs, image_upper_std, image_lower_std, ra, dec, object_name, instructions, color, wcs_data = wcs_object, image_data = refdata, offset_coords = offset_coords)
